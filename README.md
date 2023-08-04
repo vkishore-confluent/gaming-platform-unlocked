@@ -11,7 +11,7 @@ These use cases provide valuable insights into the technical requirements and co
 sample text here:
 
 <div align="center"> 
-  <img src="images/gaming_platform_unlocked_1.jpeg" width =100% heigth=100%>
+  <img src="images/gaming_platform_unlocked_1.png" width =100% heigth=100%>
 </div>
 
 ### Preventing duplicate message with ksqlDB:
@@ -19,7 +19,7 @@ sample text here:
 sample text here:
 
 <div align="center"> 
-  <img src="images/gaming_platform_unlocked_2.jpeg" width =100% heigth=100%>
+  <img src="images/gaming_platform_unlocked_2.png" width =100% heigth=100%>
 </div>
 
 ### Observability of the gaming platform:
@@ -27,5 +27,5 @@ sample text here:
 sample text here:
 
 <div align="center"> 
-  <img src="images/gaming_platform_unlocked_3.jpeg" width =100% heigth=100%>
+  <img src="images/gaming_platform_unlocked_3.png" width =100% heigth=100%>
 </div>
