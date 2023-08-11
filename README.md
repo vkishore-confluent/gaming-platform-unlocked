@@ -2,6 +2,10 @@
 
 In this demonstration, we present three essential use cases that illustrate the versatility and reliability of Confluent Cloud for building your data streaming pipeline for your gaming applications. 
 
+* Producing Multiple Event Types in Single Topic
+* Preventing duplicate message with ksqlDB
+* Observability of the gaming platform
+
 These use cases provide valuable insights into the technical requirements and considerations for creating a robust and efficient gaming data streaming system. By exploring these scenarios, you will gain a deeper understanding of how our platform can be adapted to various real-world applications.
 
 # Requirements
@@ -13,11 +17,6 @@ In order to successfully complete this demo you need to install few tools before
 - Please follow the instructions to install Terraform if it is not already installed on your system [here](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)  
 - Install Python on your local system by following the instructions [here](https://realpython.com/installing-python).
    > **Note:** This demo uses Python 3.11.3 version
-- This demo uses python modules. You can install this module through `pip` or `pip3`.
-
-  ```
-  pip3 install <module-name>
-  ```
 
 ## Prerequisites
 
@@ -35,7 +34,7 @@ In order to successfully complete this demo you need to install few tools before
   <img src="images/cloud1.jpeg" width =100% heigth=100%>
 </div>
 
-Now Click Add Key to generate API keys and store it as we will be using that key in this demo.
+5. Now Click Add Key to generate API keys and store it as we will be using that key in this demo.
 
  <div align="center"> 
   <img src="images/cloud2.jpeg" width =100% heigth=100%>
@@ -43,35 +42,35 @@ Now Click Add Key to generate API keys and store it as we will be using that key
     
    > **Note:** This is different than Kafka cluster API keys.
 
-## Setup
+### Setting up your Confluent Cloud Infrastructure
 
 1. This demo uses Terraform  to spin up resources that are needed.
 
-2. Update the `terraform/variables.tf` file for the following variables with your Cloud API credentials.
+2. Navigate to the repo's terraform directory.
 
-```
-variable "confluent_cloud_api_key" {
-  default = bash "Replace with your API Key created during pre-requsite"   
-}
-
-variable "confluent_cloud_api_secret" {
-  default = bash "Replace with your API Secret created during pre-requsite"   
-}
-```
-
- ### Build your cloud infrastructure
-
-1. Navigate to the repo's terraform directory.
    ```bash
    cd terraform
    ```
 
-1. Initialize Terraform within the directory.
+3. Update the `terraform/variables.tf` file for the following variables with your Cloud API credentials from the previous step.
+
+```
+variable "confluent_cloud_api_key" {
+  default = "Replace with your API Key created during pre-requsite"
+}
+
+variable "confluent_cloud_api_secret" {
+  default = "Replace with your API Secret created during pre-requsite"   
+}
+```
+
+4. Initialize Terraform within the directory.
+
    ```
    terraform init
    ```
 
-1. Apply the plan to create the infrastructure.
+3. Apply the plan to create the infrastructure. This should take few minutes to setup.
 
    ```
    terraform apply 
@@ -79,9 +78,18 @@ variable "confluent_cloud_api_secret" {
 
    > **Note:** Read the `main.tf` configuration file [to see what will be created](./terraform/main.tf).
 
+
+### Setting up Python Environment to run scripts:
+
+1. Install the below required modules in python to run the python scripts as directed in the following steps for implementation of the demo.
+
+```pip3 install confluent-kafka```
+
+```pip3 install fastavro```
+
 ## Architectural Diagrams:
 
-### Multiple Event Types in Single Topic:
+### 1. Multiple Event Types in Single Topic:
 
 sample text here:
 
@@ -89,7 +97,7 @@ sample text here:
   <img src="images/gaming_platform_unlocked_1.png" width =100% heigth=100%>
 </div>
 
-### Preventing duplicate message with ksqlDB:
+### 2. Preventing duplicate message with ksqlDB:
 
 sample text here:
 
@@ -97,7 +105,7 @@ sample text here:
   <img src="images/gaming_platform_unlocked_2.png" width =100% heigth=100%>
 </div>
 
-### Observability of the gaming platform:
+### 3. Observability of the gaming platform:
 
 sample text here:
 
