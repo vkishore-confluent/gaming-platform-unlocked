@@ -8,6 +8,32 @@ In this demonstration, we present three essential use cases that illustrate the 
 
 These use cases provide valuable insights into the technical requirements and considerations for creating a robust and efficient gaming data streaming system. By exploring these scenarios, you will gain a deeper understanding of how our platform can be adapted to various real-world applications.
 
+## Architectural Diagrams:
+
+### 1. Multiple Event Types in Single Topic:
+
+sample text here:
+
+<div align="center"> 
+  <img src="images/gaming_platform_unlocked_1.png" width =100% heigth=100%>
+</div>
+
+### 2. Preventing duplicate message with ksqlDB:
+
+sample text here:
+
+<div align="center"> 
+  <img src="images/gaming_platform_unlocked_2.png" width =100% heigth=100%>
+</div>
+
+### 3. Observability of the gaming platform:
+
+sample text here:
+
+<div align="center"> 
+  <img src="images/gaming_platform_unlocked_3.png" width =100% heigth=100%>
+</div>
+
 # Requirements
 
 In order to successfully complete this demo you need to install few tools before getting started.
@@ -18,9 +44,9 @@ In order to successfully complete this demo you need to install few tools before
 - Install Python on your local system by following the instructions [here](https://realpython.com/installing-python).
    > **Note:** This demo uses Python 3.11.3 version
 
-## Prerequisites
+# Prerequisites
 
-### Confluent Cloud
+## Confluent Cloud
 
 1. Sign up for a Confluent Cloud account [here](https://www.confluent.io/get-started/).
 2. After verifying your email address, access Confluent Cloud sign-in by navigating [here](https://confluent.cloud).
@@ -42,7 +68,7 @@ In order to successfully complete this demo you need to install few tools before
     
    > **Note:** This is different than Kafka cluster API keys.
 
-### Setting up your Confluent Cloud Infrastructure
+## Setting up your Confluent Cloud Infrastructure
 
 1. This demo uses Terraform  to spin up resources that are needed.
 
@@ -78,8 +104,9 @@ variable "confluent_cloud_api_secret" {
 
    > **Note:** Read the `main.tf` configuration file [to see what will be created](./terraform/main.tf).
 
+4. Once the Infrastructure is setup, return to your Confluent Cloud dashboard and click on *Cluster Settings* to obtain your Bootstap Server URL which you will require for further steps in the demo
 
-### Setting up Python Environment to run scripts:
+## Setting up Python Environment to run scripts:
 
 1. Install the below required modules in python to run the python scripts as directed in the following steps for implementation of the demo.
 
@@ -87,28 +114,28 @@ variable "confluent_cloud_api_secret" {
 
 ```pip3 install fastavro```
 
-## Architectural Diagrams:
+# Execution and Demo:
 
-### 1. Multiple Event Types in Single Topic:
+We will cover this whole use case in three different parts as given in the architectures above to get a better understanding of the concepts and provide you the opportunity to tweak few things and experiement stuff on your own.
 
-sample text here:
+## Producing Multiple Event Types in Single Topic
 
-<div align="center"> 
-  <img src="images/gaming_platform_unlocked_1.png" width =100% heigth=100%>
-</div>
-
-### 2. Preventing duplicate message with ksqlDB:
-
-sample text here:
-
-<div align="center"> 
-  <img src="images/gaming_platform_unlocked_2.png" width =100% heigth=100%>
-</div>
-
-### 3. Observability of the gaming platform:
-
-sample text here:
+1. Replace the below mentioned configuration settings in the code to point to your Confluent Cloud cluster that you created.
+    
+```
+BOOTSTRAP_SERVERS = # Replace with your Confluent Cloud bootstrap server endpoint
+SASL_USERNAME = # Replace with your Cluster API key
+SASL_PASSWORD = # Replace with your Cluster API secret
+```
+  
+  > To obtain the following details, navigate to the Clients section on the Confluent Cloud UI and select Python as the script type. From there, you can copy the bootstrap server and API Key details and replace them in the code.
 
 <div align="center"> 
-  <img src="images/gaming_platform_unlocked_3.png" width =100% heigth=100%>
+  <img src="images/Client.jpeg" width =100% heigth=100%>
 </div>
+
+2. Please run the Python script using the following syntax:
+
+```bash 
+python3 multiple_events_to_topic.py
+```
