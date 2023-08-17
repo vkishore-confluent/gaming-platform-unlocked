@@ -1,12 +1,12 @@
 variable "confluent_cloud_api_key" {
   description = "Confluent Cloud API Key (also referred as Cloud API ID)"
   type        = string
-  default = "4PIOPFIO5ZAWBFAX"
+  default = "TOJQJO536MKYCKC7"
 }
 
 variable "confluent_cloud_api_secret" {
   description = "Confluent Cloud API Secret"
   type        = string
   sensitive   = true
-  default = "lzqLePKjuy9p0pKGHK+Ci4LUSqL1Fp9oAfCxSLWb/Bd86sH4cpXoULVCtaGDjNj0"
+  default = "ELIEsPsQSGwQuw7/OXS3Ua09O2OtVbUMoHFsLYN3gS+Yz60CPecSx7dB7ewWd5su"
 }

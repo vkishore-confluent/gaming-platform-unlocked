@@ -80,15 +80,15 @@ In order to successfully complete this demo you need to install few tools before
 
 3. Update the `terraform/variables.tf` file for the following variables with your Cloud API credentials from the previous step.
 
-```
-variable "confluent_cloud_api_key" {
-  default = "Replace with your API Key created during pre-requsite"
-}
+  ```
+  variable "confluent_cloud_api_key" {
+    default = "Replace with your API Key created during pre-requsite"
+  }
 
-variable "confluent_cloud_api_secret" {
-  default = "Replace with your API Secret created during pre-requsite"   
-}
-```
+  variable "confluent_cloud_api_secret" {
+    default = "Replace with your API Secret created during pre-requsite"   
+  }
+  ```
 
 4. Initialize Terraform within the directory.
 
@@ -104,15 +104,21 @@ variable "confluent_cloud_api_secret" {
 
    > **Note:** Read the `main.tf` configuration file [to see what will be created](./terraform/main.tf).
 
-4. Once the Infrastructure is setup, return to your Confluent Cloud dashboard and click on *Cluster Settings* to obtain your Bootstap Server URL which you will require for further steps in the demo
+4. Once the Infrastructure is setup, you can see that the Bootstrap Server, API Key and Secret Values are displayed on the terminal (API Secret will be marked as sensitive). Use the following command to reveal the API Secret.
+
+  ```
+  terraform output -raw client_api_secret
+  ```
+
+5. Store the Bootstrap URL, API Key/Secret values and return to your Confluent Cloud dashboard and continue with the further steps for the Implementation
 
 ## Setting up Python Environment to run scripts:
 
 1. Install the below required modules in python to run the python scripts as directed in the following steps for implementation of the demo.
 
-```pip3 install confluent-kafka```
+  ```pip3 install confluent-kafka```
 
-```pip3 install fastavro```
+  ```pip3 install fastavro```
 
 # Execution and Demo:
 

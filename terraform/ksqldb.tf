@@ -8,7 +8,7 @@ resource "confluent_ksql_cluster" "ksql_cluster_1" {
     id = confluent_service_account.tf_cluster_admin.id
   }
   environment {
-    id = "env-97ryr0" #change to confluent_environment.development.id
+    id = confluent_environment.development.id
   }
   lifecycle {
     prevent_destroy = false
