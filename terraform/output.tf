@@ -10,3 +10,12 @@ output client_api_secret {
   value = confluent_api_key.tf_cluster_admin_apikey.secret
   sensitive = true
 }
+
+output env_api_key {
+  value = confluent_api_key.env-manager-schema-registry-api-key.id
+}
+
+output env_api_secret {
+  value = confluent_api_key.env-manager-schema-registry-api-key.secret
+  sensitive = true
+}
