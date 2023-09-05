@@ -172,7 +172,7 @@ In order to maintain order and process events of related data, storing multiple 
 2. Please run the Python script using the following syntax:
 
 ```bash 
-python3 multiple_events_to_topic.py
+python3 send_multiple_events_to_topic.py
 ```
 
 3. If the credentials were added properly, the script should run successfully and produce the following output.
@@ -182,3 +182,154 @@ python3 multiple_events_to_topic.py
 </div>
 
 This python script sends two types of events *Player Health* and *Player Position* both to the topic *game-events* and the scema registry is configured to accept both schemas and thereby showcasing the implementation of the demo.
+
+## 2. Preventing duplicate message with ksqlDB:
+
+With KsqlDB, you can continuously transform, enrich, join, and aggregate your data using simple SQL syntax. You can gain value from your data directly from Confluent in real-time. Also, ksqlDB is a fully managed service within Confluent Cloud with a 99.9% uptime SLA. You can now focus on developing services and building your data pipeline while letting Confluent manage your resources for you.
+
+Even when you tune your producers based on best practices, message duplication can occur with any API communication. In order to process duplicate messages and discard them quickly, you can utilize ksqlDB with a twist
+
+1. Create a Stream into the ksqldb Stream Functions by updating the timestamp
+
+  ```
+  CREATE STREAM TXN_RAW (
+      ID STRING,
+      USER_ID STRING,
+      TXN_TYPE STRING,
+      TXN_TIMESTAMP STRING)
+  WITH (KAFKA_TOPIC='txn_raw',
+        TIMESTAMP='txn_timestamp',
+        TIMESTAMP_FORMAT='yyyy-MM-dd HH:mm:ss',
+        VALUE_FORMAT='JSON',
+        PARTITIONS=3);
+
+  ```
+
+2. Create another Stream by repartioning the messages to handle all keyless messages stored in round robin fashion in the topics.
+
+  ```
+  CREATE STREAM TXN_PARTITIONEDBY_TXNID
+    WITH (KAFKA_TOPIC='txn_raw_key_txn_id', 
+          VALUE_FORMAT='AVRO',
+          KEY_FORMAT='KAFKA') AS
+      SELECT
+          ID AS ID_KEY,
+          AS_VALUE(ID) AS ID,
+          USER_ID,
+          TXN_TYPE
+      FROM TXN_RAW
+      PARTITION BY ID;
+
+  ```
+
+3. Create a Table to disable the buffering to get the results faster
+
+  ```
+  Add specific query property
+  SET 'cache.max.bytes.buffering' = '0';
+
+  CREATE TABLE TXN_WINDOW_10MIN_UNIQUE_TABLE
+  WITH (KAFKA_TOPIC='txn_window_10min_unique',
+        VALUE_FORMAT='AVRO',
+        KEY_FORMAT='KAFKA')
+    AS
+      SELECT
+          ID_KEY,
+          EARLIEST_BY_OFFSET(ID) AS ID,
+          EARLIEST_BY_OFFSET(USER_ID) AS USER_ID,
+          EARLIEST_BY_OFFSET(TXN_TYPE) AS TXN_TYPE,
+          COUNT(*) AS MESSAGE_NO
+      FROM TXN_PARTITIONEDBY_TXNID
+      WINDOW TUMBLING (SIZE 10 MINUTES, GRACE PERIOD 2 MINUTES)
+      GROUP BY ID_KEY
+      HAVING COUNT(*) = 1;
+  ```
+
+4. Create a new Stream to capture unique transactions every 10 minutes with a 2 minute grace period:
+
+  ```
+  CREATE STREAM TXN_WINDOW_10MIN_UNIQUE_STREAM (
+    ID_KEY STRING KEY,
+    ID STRING,
+    USER_ID STRING,
+    TXN_TYPE STRING,
+    MESSAGE_NO BIGINT)
+  WITH (KAFKA_TOPIC='txn_window_10min_unique',
+        VALUE_FORMAT='AVRO',
+        KEY_FORMAT='KAFKA');
+  ```
+
+5. Create a Stream of unique transactions:
+
+  ```
+  CREATE STREAM TXN_UNIQUE (
+    ID_KEY STRING KEY,
+    ID STRING,
+    USER_ID STRING,
+    TXN_TYPE STRING,
+    MESSAGE_NO BIGINT)
+  WITH (KAFKA_TOPIC='txn_unique',
+        VALUE_FORMAT='AVRO',
+        KEY_FORMAT='KAFKA',
+        PARTITIONS=3);
+
+  ```
+
+6. Create a Transaction Lookup Table which will create a timestamp for the first event of the transaction.
+
+  ```
+  CREATE TABLE TXN_LOOKUP_TABLE
+  WITH (KAFKA_TOPIC='txn_lookup_table',
+        VALUE_FORMAT='AVRO',
+        KEY_FORMAT='KAFKA')
+    AS
+      SELECT ID_KEY,
+          EARLIEST_BY_OFFSET(ID) AS ID,
+          TIMESTAMPTOSTRING(EARLIEST_BY_OFFSET(ROWTIME), 'yyyy-MM-dd HH:mm:ss.SSS') AS MSG_ROWTIME,
+          EARLIEST_BY_OFFSET(ROWTIME) AS MSG_EPOCH
+      FROM TXN_UNIQUE
+      GROUP BY ID_KEY;
+  ```
+
+7. Check duplicate transactions arrived after the 10 minutes window with the global table and add if not present in the lookup table
+
+  ```
+  INSERT INTO TXN_UNIQUE
+    SELECT
+        T10.ID_KEY AS ID_KEY,
+        T10.ID AS ID,
+        T10.USER_ID AS USER_ID,
+        T10.TXN_TYPE AS TXN_TYPE,
+        T10.MESSAGE_NO AS MESSAGE_NO
+    FROM TXN_WINDOW_10MIN_UNIQUE_STREAM T10
+        LEFT JOIN TXN_LOOKUP_TABLE TLT ON T10.ID_KEY = TLT.ID_KEY
+    WHERE T10.ID_KEY IS NOT NULL
+        AND TLT.ID_KEY IS NULL
+    EMIT CHANGES;
+  ```
+
+8. Create a Stream for lookup table cleaning by inserting a tombstone message as ksqldb memory
+
+  ```
+  CREATE STREAM TXN_LOOKUP_TABLE_CLEANING_STREAM (
+    ID_KEY STRING KEY,
+    DUMMY STRING) 
+  WITH (KAFKA_TOPIC='txn_lookup_table', 
+       VALUE_FORMAT='AVRO',
+       KEY_FORMAT='KAFKA');
+  ```
+
+Even though it looks like a quick fix to generate TTL in ksqlDB, you need to be careful while sending Tombstones because some of the Apache Kafka Clients have different default hashing strategies. Using a disparate hashing method will generate a different hash key which will cause the keys ending up in different partitions. It will defeat the purpose of this cleaning step and make sure that clients use the same hashing strategy as the ksqlDB.
+
+  Once you have completed all the steps, you will have the complete stream lineage as shown below:
+
+  <div align="center"> 
+    <img src="images/Client.jpeg" width =100% heigth=100%>
+  </div>
+
+You can access the Stream Lineage Feature inside Confluent Cloud by accessing the *Stream Lineage* menu in the left sidebar of the Confluent Cloud Dashboard.
+
+## Observability of the gaming platform
+
+Creating observability for mission- critical applications can be challenging, but with a decent strategy you will be able to collect important metrics and errors from your servers.
+
