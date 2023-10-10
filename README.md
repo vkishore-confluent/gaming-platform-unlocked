@@ -1,38 +1,12 @@
 # Gaming Platform Unlocked - Data Streaming Pipeline for Gaming Applications
 
-In this demonstration, we present three essential use cases that illustrate the versatility and reliability of Confluent Cloud for building your data streaming pipeline for your gaming applications. 
+In this demonstration, we present three essential use cases that illustrate the versatility and reliability of Confluent Cloud for building your data streaming pipeline for your gaming application. These use cases provide valuable insights into the technical requirements and considerations for creating a robust and efficient gaming data streaming system.
 
 * Producing Multiple Event Types in Single Topic
 * Preventing duplicate message with ksqlDB
 * Observability of the gaming platform
 
-These use cases provide valuable insights into the technical requirements and considerations for creating a robust and efficient gaming data streaming system. By exploring these scenarios, you will gain a deeper understanding of how our platform can be adapted to various real-world applications.
-
-<!-- ## Architectural Diagrams:
-
-### 1. Multiple Event Types in Single Topic:
-
-sample text here:
-
-<div align="center"> 
-  <img src="images/gaming_platform_unlocked_1.png" width =100% heigth=100%>
-</div>
-
-### 2. Preventing duplicate message with ksqlDB:
-
-sample text here:
-
-<div align="center"> 
-  <img src="images/gaming_platform_unlocked_2.png" width =100% heigth=100%>
-</div>
-
-### 3. Observability of the gaming platform:
-
-sample text here:
-
-<div align="center"> 
-  <img src="images/gaming_platform_unlocked_3.png" width =100% heigth=100%>
-</div> -->
+ By exploring these scenarios, you will gain a deeper understanding of how Confluent Cloud can be adapted to various real-world applications.
 
 # Requirements
 
@@ -55,29 +29,31 @@ In order to successfully complete this demo you need to install few tools before
 
    > **Note:** If you're logging in for the first time you will see a wizard that will walk you through the some tutorials. Minimize this as you will walk through these steps in this guide.
 
-4. Create *Confluent Cloud API keys* by following the steps in UI. Click on the hamburger icon that is present on the right top section and click on Cloud API Key.
+4. Create *Confluent Cloud API keys* by following the steps in UI. Click on the hamburger icon that is present on the right top section and click on Cloud API Keys.
 
 <div align="center"> 
   <img src="images/cloud1.png" width =100% heigth=100%>
 </div>
 
-5. Now Click Add Key to generate API keys and store it as we will be using that key in this demo.
+5. In the Access Control menu, select Global Access and click on the Next Button
 
  <div align="center"> 
   <img src="images/cloud2.png" width =100% heigth=100%>
 </div>
+
+6. Now Click Add Key to generate API keys and store it as we will be using this key on terraform to deploy the infrastructure.
     
    > **Note:** This is different than Kafka cluster API keys.
 
 ## Setting up your Confluent Cloud Infrastructure
 
-1. This demo uses Terraform to spin up the infrastructure and the resources that are needed for this demo.
+This demo uses Terraform to spin up the infrastructure and the resources that are needed for this demo. This terraform code creates the necessary confluent cloud cluster, ksqldb, schema registry and also topics that are needed for the demo.
 
 2. Navigate to the repo's terraform directory.
 
-   ```bash
-   cd terraform
-   ```
+  ```bash 
+  cd terraform
+  ```
 
 3. Update the `terraform/variables.tf` file for the following variables with your Cloud API credentials from the previous step.
 
@@ -93,9 +69,9 @@ In order to successfully complete this demo you need to install few tools before
 
 4. Initialize Terraform within the directory.
 
-   ```
-   terraform init
-   ```
+  ```
+  terraform init
+  ```
 
 5. Use the following command to create the terraform plan which validates all the components described in the terraform script
 
@@ -105,9 +81,9 @@ In order to successfully complete this demo you need to install few tools before
 
 6. Apply the plan to create the infrastructure. This should take few minutes to setup.
 
-   ```
-   terraform apply 
-   ```
+  ```
+  terraform apply 
+  ```
 
    > **Note:** Read the `main.tf` and the other component specific (.tf) configuration files [to see what will be created](./terraform/main.tf).
 

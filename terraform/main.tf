@@ -1,6 +1,6 @@
 # This part creates environment
 resource "confluent_environment" "development" {
-  display_name = "Development"
+  display_name = "GithubRepo"
   lifecycle {
     prevent_destroy = true
   }
@@ -11,7 +11,7 @@ resource "confluent_kafka_cluster" "basic" {
   display_name = "Gaming Platform Unlocked"
   availability = "SINGLE_ZONE"
   cloud        = "AWS"
-  region       = "us-east-2"
+  region       = "ap-south-1"
   basic {}
 
   environment {

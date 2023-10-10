@@ -11,6 +11,10 @@ output client_api_secret {
   sensitive = true
 }
 
+output schema_registry_url {
+  value = confluent_schema_registry_cluster.essentials.rest_endpoint
+}
+
 output env_api_key {
   value = confluent_api_key.env-manager-schema-registry-api-key.id
 }
