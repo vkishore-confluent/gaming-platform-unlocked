@@ -5,15 +5,21 @@ from confluent_kafka.serialization import StringSerializer, SerializationContext
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroSerializer
 
-# update your cluster credentials here
-cluster_bootstrap = 'pkc-l7pr2.ap-south-1.aws.confluent.cloud:9092'
-cluster_api_key = 'ANEXNLPCC3VKDOIC'
-cluster_api_secret = 'LcZvNW/vk3XgOYjqjZMvEI3BWkkw6yeoq7xoGmX3VSqgQ2qYinhJwW7bsm3LjxOI'
-
-# update your schema registry credentials here
-schemaregistry_url = 'https://psrc-4r3xk.us-east-2.aws.confluent.cloud'
-schemaregistry_api_key = '6BAXBHCKOZBKULLP'
-schemaregistry_api_secret = 'MsX2pdup+eBArSHsTowAyFf4SIGDRhyQcKrDH9ak13aF64GhOsGPfP96Xfg4Sc/E'
+# reading credentials from files/credentials.txt
+creds_file = open(os.path.dirname(__file__) + '/../files/credentials.txt')
+for line in creds_file.readlines():
+    if (line.split(' = ')[0]) == 'cluster_bootstrap':
+        cluster_bootstrap = line.split(' = ')[1].strip()
+    elif (line.split(' = ')[0]) == 'cluster_api_key':
+        cluster_api_key = line.split(' = ')[1].strip()
+    elif (line.split(' = ')[0]) == 'cluster_api_secret':
+        cluster_api_secret = line.split(' = ')[1].strip()
+    elif (line.split(' = ')[0]) == 'schemaregistry_url':
+        schemaregistry_url = line.split(' = ')[1].strip()
+    elif (line.split(' = ')[0]) == 'schemaregistry_api_key':
+        schemaregistry_api_key = line.split(' = ')[1].strip()
+    elif (line.split(' = ')[0]) == 'schemaregistry_api_secret':
+        schemaregistry_api_secret = line.split(' = ')[1].strip()
 
 schema_str = []
 
@@ -119,7 +125,6 @@ def main():
                 playerposition = PlayerPosition(player_id=player_id,
                             x=x,
                             y=y)
-                print(avro_serializer1(playerposition, SerializationContext(topic, MessageField.VALUE)))
                 producer.produce(topic=topic,
                                     key=string_serializer(str(uuid4())),
                                     value=avro_serializer1(playerposition, SerializationContext(topic, MessageField.VALUE)),

@@ -1,0 +1,26 @@
+2023-10-16 14:30:00    topic1  0   1   This is a sample Kafka log message. Offset: 1
+2023-10-16 14:30:10    topic2  0   2   Another sample log entry with offset 2
+2023-10-16 14:30:20    topic1  1   1   More log data for topic1, offset 1
+2023-10-16 14:30:30    topic2  1   2   Kafka log entry with offset 2 for topic2
+2023-10-16 14:30:40    topic1  2   1   Yet another log entry for topic1, offset 1
+2023-10-16 14:30:50    topic2  2   2   And one more for topic2, offset 2
+2023-10-16 14:30:00    topic1  0   1   This is a sample Kafka log message. Offset: 1
+2023-10-16 14:30:10    topic2  0   2   Another sample log entry with offset 2
+2023-10-16 14:30:20    topic1  1   1   More log data for topic1, offset 1
+2023-10-16 14:30:30    topic2  1   2   Kafka log entry with offset 2 for topic2
+2023-10-16 14:30:40    topic1  2   1   Yet another log entry for topic1, offset 1
+2023-10-16 14:30:50    topic2  2   2   And one more for topic2, offset 2
+2023-10-16 14:30:00    topic1  0   1   This is a sample Kafka log message. Offset: 1
+2023-10-16 14:30:10    topic2  0   2   Another sample log entry with offset 2
+2023-10-16 14:30:20    topic1  1   1   More log data for topic1, offset 1
+2023-10-16 14:30:30    topic2  1   2   Kafka log entry with offset 2 for topic2
+2023-10-16 14:30:40    topic1  2   1   Yet another log entry for topic1, offset 1
+2023-10-16 14:30:50    topic2  2   2   And one more for topic2, offset 2
+2023-10-16 14:30:00    topic1  0   1   This is a sample Kafka log message. Offset: 1
+2023-10-16 14:30:10    topic2  0   2   Another sample log entry with offset 2
+2023-10-16 14:30:20    topic1  1   1   More log data for topic1, offset 1
+2023-10-16 14:30:30    topic2  1   2   Kafka log entry with offset 2 for topic2
+2023-10-16 14:30:40    topic1  2   1   Yet another log entry for topic1, offset 1
+2023-10-16 14:30:50    topic2  2   2   And one more for topic2, offset 2
+
+

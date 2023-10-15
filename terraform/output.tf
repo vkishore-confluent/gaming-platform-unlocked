@@ -23,3 +23,15 @@ output env_api_secret {
   value = confluent_api_key.env-manager-schema-registry-api-key.secret
   sensitive = true
 }
+
+resource "local_file" "with_source_worker_properties" {
+    filename = "../files/credentials.txt"
+    content = templatefile("../files/credentials.tmpl", {
+        bootstrap_server = substr(confluent_kafka_cluster.basic.bootstrap_endpoint,11,-1)
+        kafka_cluster_key = confluent_api_key.tf_cluster_admin_apikey.id
+        kafka_cluster_secret = confluent_api_key.tf_cluster_admin_apikey.secret
+        sr_endpoint = confluent_schema_registry_cluster.essentials.rest_endpoint
+        sr_env_key = confluent_api_key.env-manager-schema-registry-api-key.id
+        sr_env_secret = confluent_api_key.env-manager-schema-registry-api-key.secret
+    })
+}

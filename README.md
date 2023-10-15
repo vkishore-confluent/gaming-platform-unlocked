@@ -8,7 +8,7 @@ In this demonstration, we present three essential use cases that illustrate the 
 
  By exploring these scenarios, you will gain a deeper understanding of how Confluent Cloud can be adapted to various real-world applications.
 
-# Requirements
+## Requirements
 
 In order to successfully complete this demo you need to install few tools before getting started.
 
@@ -19,9 +19,9 @@ In order to successfully complete this demo you need to install few tools before
   
    > **Note:** This demo uses Python 3.11.3 version
 
-# Prerequisites
+## Prerequisites
 
-## Confluent Cloud
+### 1. Confluent Cloud
 
 1. Sign up for a Confluent Cloud account [here](https://www.confluent.io/get-started/).
 2. After verifying your email address, access Confluent Cloud sign-in by navigating [here](https://confluent.cloud).
@@ -39,15 +39,16 @@ In order to successfully complete this demo you need to install few tools before
 
  <div align="center"> 
   <img src="images/cloud2.png" width =100% heigth=100%>
+  <br>
 </div>
 
 6. Now Click Add Key to generate API keys and store it as we will be using this key on terraform to deploy the infrastructure.
     
-   > **Note:** This is different than Kafka cluster API keys.
+   > **Note:** This is different than Kafka Cluster API keys.
 
-## Setting up your Confluent Cloud Infrastructure
+### 2. Setting up your Confluent Cloud Infrastructure
 
-This demo uses Terraform to spin up the infrastructure and the resources that are needed for this demo. This terraform code creates the necessary confluent cloud cluster, ksqldb, schema registry and also topics that are needed for the demo.
+This demo uses Terraform to spin up the entire infrastructure and the resources that are needed for this demo. This terraform code creates the confluent cloud cluster, ksqldb, schema registry and also topics that are needed for the demo.
 
 2. Navigate to the repo's terraform directory.
 
@@ -59,11 +60,11 @@ This demo uses Terraform to spin up the infrastructure and the resources that ar
 
   ```
   variable "confluent_cloud_api_key" {
-    default = "Replace with your API Key created during pre-requsite"
+    default = "Replace with your API Key created during pre-requesite"
   }
 
   variable "confluent_cloud_api_secret" {
-    default = "Replace with your API Secret created during pre-requsite"   
+    default = "Replace with your API Secret created during pre-requesite"   
   }
   ```
 
@@ -87,7 +88,7 @@ This demo uses Terraform to spin up the infrastructure and the resources that ar
 
    > **Note:** Read the `main.tf` and the other component specific (.tf) configuration files [to see what will be created](./terraform/main.tf).
 
-7. Once the Infrastructure is setup, you can see that the Bootstrap Server, API Key and Secret Values are displayed on the terminal (API Secret will be marked as sensitive). Use the following command to reveal the API Secret.
+7. Once the Infrastructure is setup, you can see that the Bootstrap Server,Schema Registry Endpoint, API Key and Secret Values are displayed on the terminal (API Secret will be marked as sensitive). Use the following command to reveal the API Secret.
 
   ```
   terraform output -raw client_api_secret
@@ -97,9 +98,11 @@ This demo uses Terraform to spin up the infrastructure and the resources that ar
   <img src="images/terminal1.png" width =100% heigth=100%>
 </div>
 
-5. Store the *Bootstrap URL, Client API Key/Secret* values and return to your Confluent Cloud dashboard and continue with the further steps for the Implementation
+5. The follwoing credentials - *Bootstrap URL, Cluster API Key, Cluster API Secret, Scehma Registry URL, Schema Registry API Key, Schema Registry API Secret* are stored to credentials.txt file in the files directory.
 
-## Setting up Python Environment to run scripts:
+   > **Note:** The python files in the further steps in the demo will read the credentials directly from the credentials.txt file, so refrain moving this file from the files directory.
+
+### 3. Setting up Python Environment:
 
 1. Install the below required modules in python to run the python scripts as directed in the following steps for implementation of the demo.
 
@@ -107,11 +110,11 @@ This demo uses Terraform to spin up the infrastructure and the resources that ar
   pip3 install confluent-kafka
   ```
 
-# Execution and Demo:
+## Execution and Demo:
 
 We will cover this whole use case in three different parts to get a better understanding of the concepts and provide you the opportunity to tweak few things and experiement stuff on your own.
 
-## 1. Producing Multiple Event Types in Single Topic
+### 1. Producing Multiple Event Types in Single Topic
 
 In order to maintain order and process events of related data, storing multiple event types in one topic is crucial. Also, in order to reduce the transfer cost, integrating the producers and consumers with a schema registry will be the first item in your list.
 
@@ -129,22 +132,6 @@ In order to maintain order and process events of related data, storing multiple 
   cd python/
   ```
 
-2. Use any code editor of your choice and replace the below mentioned configuration settings in the code to point to your Confluent Cloud cluster that you created. 
-  
-  > Use Credentials exported from the terminal after terraform scripts were executed
-    
-  ```
-  BOOTSTRAP_SERVERS = # Replace with your Confluent Cloud bootstrap server endpoint
-  SASL_USERNAME = # Replace with your Cluster API key
-  SASL_PASSWORD = # Replace with your Cluster API secret
-  ```
-  
-  <!-- > To obtain the following details, navigate to the Clients section on the Confluent Cloud UI and select Python as the script type. From there, you can copy the bootstrap server and API Key details and replace them in the code.
-
-<div align="center"> 
-  <img src="images/Client.jpeg" width =100% heigth=100%>
-</div> -->
-
 2. Please run the Python script using the following syntax:
 
 ```bash 
@@ -154,18 +141,20 @@ python3 send_multiple_events_to_topic.py
 3. If the credentials were added properly, the script should run successfully and produce the following output.
 
 <div align="center"> 
-  <img src="images/Client.jpeg" width =100% heigth=100%>
+  <img src="images/python-result.png" width =100% heigth=100%>
 </div>
 
 This python script sends two types of events *Player Health* and *Player Position* both to the topic *game-events* and the scema registry is configured to accept both schemas and thereby showcasing the implementation of the demo.
 
 ## 2. Preventing duplicate message with ksqlDB:
 
-With KsqlDB, you can continuously transform, enrich, join, and aggregate your data using simple SQL syntax. You can gain value from your data directly from Confluent in real-time. Also, ksqlDB is a fully managed service within Confluent Cloud with a 99.9% uptime SLA. You can now focus on developing services and building your data pipeline while letting Confluent manage your resources for you.
-
 Even when you tune your producers based on best practices, message duplication can occur with any API communication. In order to process duplicate messages and discard them quickly, you can utilize ksqlDB with a twist
 
-1. Create a Stream into the ksqldb Stream Functions by updating the timestamp
+With KsqlDB, you can continuously transform, enrich, join, and aggregate your data using simple SQL syntax. You can gain value from your data directly from Confluent in real-time. 
+
+Also, ksqlDB is a fully managed service within Confluent Cloud with a 99.9% uptime SLA. You can now focus on developing services and building your data pipeline while letting Confluent manage your resources for you.
+
+### 1. Create a Stream into the ksqldb Stream Functions by updating the timestamp
 
   ```
   CREATE STREAM TXN_RAW (
@@ -181,7 +170,7 @@ Even when you tune your producers based on best practices, message duplication c
 
   ```
 
-2. Create another Stream by repartioning the messages to handle all keyless messages stored in round robin fashion in the topics.
+### 2. Create another Stream by repartioning the messages to handle all keyless messages stored in round robin fashion in the topics.
 
   ```
   CREATE STREAM TXN_PARTITIONEDBY_TXNID
@@ -198,7 +187,7 @@ Even when you tune your producers based on best practices, message duplication c
 
   ```
 
-3. Create a Table to disable the buffering to get the results faster
+### 3. Create a Table to disable the buffering to get the results faster
 
   ```
   Add specific query property
@@ -206,22 +195,22 @@ Even when you tune your producers based on best practices, message duplication c
 
   CREATE TABLE TXN_WINDOW_10MIN_UNIQUE_TABLE
   WITH (KAFKA_TOPIC='txn_window_10min_unique',
-        VALUE_FORMAT='AVRO',
-        KEY_FORMAT='KAFKA')
-    AS
-      SELECT
-          ID_KEY,
-          EARLIEST_BY_OFFSET(ID) AS ID,
-          EARLIEST_BY_OFFSET(USER_ID) AS USER_ID,
-          EARLIEST_BY_OFFSET(TXN_TYPE) AS TXN_TYPE,
-          COUNT(*) AS MESSAGE_NO
-      FROM TXN_PARTITIONEDBY_TXNID
-      WINDOW TUMBLING (SIZE 10 MINUTES, GRACE PERIOD 2 MINUTES)
-      GROUP BY ID_KEY
-      HAVING COUNT(*) = 1;
+      VALUE_FORMAT='AVRO',
+      KEY_FORMAT='KAFKA')
+  AS
+    SELECT
+        ID_KEY,
+        EARLIEST_BY_OFFSET(ID) AS ID,
+        EARLIEST_BY_OFFSET(USER_ID) AS USER_ID,
+        EARLIEST_BY_OFFSET(TXN_TYPE) AS TXN_TYPE,
+        COUNT(*) AS MESSAGE_NO
+    FROM TXN_PARTITIONEDBY_TXNID
+    WINDOW TUMBLING (SIZE 10 MINUTES, GRACE PERIOD 2 MINUTES)
+    GROUP BY ID_KEY
+    HAVING COUNT(*) = 1;
   ```
 
-4. Create a new Stream to capture unique transactions every 10 minutes with a 2 minute grace period:
+### 4. Create a new Stream to capture unique transactions every 10 minutes with a 2 minute grace period:
 
   ```
   CREATE STREAM TXN_WINDOW_10MIN_UNIQUE_STREAM (
@@ -235,7 +224,7 @@ Even when you tune your producers based on best practices, message duplication c
         KEY_FORMAT='KAFKA');
   ```
 
-5. Create a Stream of unique transactions:
+### 5. Create a Stream of unique transactions:
 
   ```
   CREATE STREAM TXN_UNIQUE (
@@ -251,7 +240,7 @@ Even when you tune your producers based on best practices, message duplication c
 
   ```
 
-6. Create a Transaction Lookup Table which will create a timestamp for the first event of the transaction.
+### 6. Create a Transaction Lookup Table which will create a timestamp for the first event of the transaction.
 
   ```
   CREATE TABLE TXN_LOOKUP_TABLE
@@ -267,7 +256,7 @@ Even when you tune your producers based on best practices, message duplication c
       GROUP BY ID_KEY;
   ```
 
-7. Check duplicate transactions arrived after the 10 minutes window with the global table and add if not present in the lookup table
+### 7. Check duplicate transactions arrived after the 10 minutes window with the global table and add if not present in the lookup table
 
   ```
   INSERT INTO TXN_UNIQUE
@@ -284,7 +273,7 @@ Even when you tune your producers based on best practices, message duplication c
     EMIT CHANGES;
   ```
 
-8. Create a Stream for lookup table cleaning by inserting a tombstone message as ksqldb memory
+### 8. Create a Stream for lookup table cleaning by inserting a tombstone message as ksqldb memory
 
   ```
   CREATE STREAM TXN_LOOKUP_TABLE_CLEANING_STREAM (
@@ -297,10 +286,12 @@ Even when you tune your producers based on best practices, message duplication c
 
 Even though it looks like a quick fix to generate TTL in ksqlDB, you need to be careful while sending Tombstones because some of the Apache Kafka Clients have different default hashing strategies. Using a disparate hashing method will generate a different hash key which will cause the keys ending up in different partitions. It will defeat the purpose of this cleaning step and make sure that clients use the same hashing strategy as the ksqlDB.
 
-  Once you have completed all the steps, you will have the complete stream lineage as shown below:
+### Stream Lineage:
+
+Once you have completed all the steps, you will have the complete stream lineage as shown below:
 
   <div align="center"> 
-    <img src="images/Client.jpeg" width =100% heigth=100%>
+    <img src="images/stream-lineage.png" width =100% heigth=100%>
   </div>
 
 You can access the Stream Lineage Feature inside Confluent Cloud by accessing the *Stream Lineage* menu in the left sidebar of the Confluent Cloud Dashboard.
@@ -308,4 +299,14 @@ You can access the Stream Lineage Feature inside Confluent Cloud by accessing th
 ## Observability of the gaming platform
 
 Creating observability for mission- critical applications can be challenging, but with a decent strategy you will be able to collect important metrics and errors from your servers.
+
+We are going to use a tiny software called fluent-bit to demonstrate the observability feature. Please follow the following steps to continue with the demo.
+
+### Install Fluent-Bit:
+
+Download and install Fluent Bit based on your operating system. You can find installation instructions for various platforms on the [Fluent Bit download page](https://docs.fluentbit.io/manual/installation/getting-started-with-fluent-bit)
+
+> **Note:** In this demo, we are going to use Homebrew on Mac to install fluent-bit in our local machine.
+
+
 
