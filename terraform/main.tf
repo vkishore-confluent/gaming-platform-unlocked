@@ -1,6 +1,6 @@
 # This part creates environment
 resource "confluent_environment" "development" {
-  display_name = "GithubRepo"
+  display_name = "GamingPlatformUnlocked"
   lifecycle {
     prevent_destroy = true
   }
