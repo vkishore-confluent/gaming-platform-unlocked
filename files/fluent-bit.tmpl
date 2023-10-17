@@ -9,9 +9,9 @@
 [OUTPUT]
     Name        kafka
     Match       *
-    brokers	    pkc-l7pr2.ap-south-1.aws.confluent.cloud:9092
+    brokers	    ${bootstrap_server}
     topics  logs
     rdkafka.security.protocol   sasl_ssl
     rdkafka.sasl.mechanisms PLAIN
-    rdkafka.sasl.username   XYJNDXV246FT3GVP
-    rdkafka.sasl.password   UUrCuLV99EcEKc+E/QkcjqDJv4ze9qK6DDQSQHWngyt212vsmMLLx1QeSdPiM9jk
+    rdkafka.sasl.username   ${kafka_cluster_key}
+    rdkafka.sasl.password   ${kafka_cluster_secret}

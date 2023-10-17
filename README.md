@@ -19,6 +19,10 @@ In order to successfully complete this demo you need to install few tools before
   
    > **Note:** This demo uses Python 3.11.3 version
 
+- Download and install Fluent Bit based on your operating system. You can find installation instructions for various platforms on the [Fluent Bit download page](https://docs.fluentbit.io/manual/installation/getting-started-with-fluent-bit)
+
+  > **Note:** In this demo, we are going to use Homebrew on Mac to install fluent-bit in our local machine.
+
 ## Prerequisites
 
 ### 1. Confluent Cloud
@@ -154,6 +158,14 @@ With KsqlDB, you can continuously transform, enrich, join, and aggregate your da
 
 Also, ksqlDB is a fully managed service within Confluent Cloud with a 99.9% uptime SLA. You can now focus on developing services and building your data pipeline while letting Confluent manage your resources for you.
 
+### Generate Sample data using python:
+
+Run the following command to generate data continously to the cluster for working with ksqldb in this demo.
+
+  ```bash
+  python3 produce_sample_data.py
+  ```
+
 ### 1. Create a Stream into the ksqldb Stream Functions by updating the timestamp
 
   ```
@@ -237,7 +249,6 @@ Also, ksqlDB is a fully managed service within Confluent Cloud with a 99.9% upti
         VALUE_FORMAT='AVRO',
         KEY_FORMAT='KAFKA',
         PARTITIONS=3);
-
   ```
 
 ### 6. Create a Transaction Lookup Table which will create a timestamp for the first event of the transaction.
@@ -302,11 +313,88 @@ Creating observability for mission- critical applications can be challenging, bu
 
 We are going to use a tiny software called fluent-bit to demonstrate the observability feature. Please follow the following steps to continue with the demo.
 
-### Install Fluent-Bit:
+### Start Fluent-Bit service:
 
-Download and install Fluent Bit based on your operating system. You can find installation instructions for various platforms on the [Fluent Bit download page](https://docs.fluentbit.io/manual/installation/getting-started-with-fluent-bit)
+Run the following command from the root directory to start the fluent bit service on your local machine.
 
-> **Note:** In this demo, we are going to use Homebrew on Mac to install fluent-bit in our local machine.
+  ```
+  fluent-bit -c fluent-bit/fluent-bit.conf
+  ```
+  > Note: The fluent bit configuration will be autopopulated with the necessary credentials by terraform to connect to confluent cloud.
 
+### Check logs on Confluent Cloud:
 
+The fluent bit client sends a load of sample data located in the fluent-bit/syslog.log file to the kafka cluster. You can check this by heading over to Confluent Cloud and check the messages inside the **logs** topic.
 
+### Use kqlDB to check for ssh attacks in the logs:
+
+Let us see a quick example on how to use ksqldb to process the logs and look for ssh attacks. Follow the given steps to create a ssh_attacks stream based on the logs received.
+
+1. Create a Stream from the logs topic:
+
+  ```bash
+  CREATE STREAM syslog_stream (
+    timestamp DOUBLE, 
+    log STRING) 
+  WITH (
+    KAFKA_TOPIC='logs', 
+    VALUE_FORMAT='JSON');
+
+  ```
+
+2. Create actionable stream of SSH attacks, filtering syslog messages where user is invalid
+
+  ```bash
+  CREATE STREAM ssh_attacks_stream AS
+    SELECT
+      EXTRACTJSONFIELD(log, '$.ts') AS log_timestamp,
+      EXTRACTJSONFIELD(log, '$.host') AS host,
+      EXTRACTJSONFIELD(log, '$.message') AS message,
+      EXTRACTJSONFIELD(log, '$.remote_address') AS remote_address,
+      EXTRACTJSONFIELD(log, '$.facility') AS facility
+    FROM logs
+    WHERE EXTRACTJSONFIELD(log, '$.message') LIKE '%Invalid user%';
+  ```
+
+3. Create an enriched ssh_attacks_stream replacing the invalid users to attack users
+
+  ```bash
+  CREATE STREAM enriched_log_stream AS
+  SELECT
+    LOG_TIMESTAMP,
+    HOST,
+    CASE
+      WHEN MESSAGE LIKE '%Invalid user%' THEN 'Attack user'
+      ELSE FACILITY
+    END AS FACILITY,
+    REMOTE_ADDRESS
+  FROM ssh_attacks_stream;
+  ```
+
+4. Create a user aggregate table
+
+  ```bash
+  CREATE TABLE user_aggregate_table AS
+  SELECT
+    HOST AS USER,
+    COUNT(*) AS REPEAT_COUNT
+  FROM enriched_log_stream
+  GROUP BY HOST;
+  ```
+
+5. Create a persistent query to continuously update the user aggregate
+
+  ```bash
+  CREATE TABLE user_aggregate_result AS
+  SELECT * FROM user_aggregate_table;
+  ```
+
+### Output data from Enriched Logs:
+
+  <div align="center"> 
+    <img src="images/enriched_log_stream.png" width =80% heigth=100%>
+  </div>
+
+We have obtained an enriched log stream using ksqldb and also we have created a table with the number of attack attempts based on the host.
+
+This data can further be consumed into other alerting or notifications services to trigger alerts on the system.
