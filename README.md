@@ -392,7 +392,7 @@ Let us see a quick example on how to use ksqldb to process the logs and look for
 ### Output data from Enriched Logs:
 
   <div align="center"> 
-    <img src="images/enriched_log_stream.png" width =80% heigth=100%>
+    <img src="images/enriched_log_stream.png" width =50% heigth=100%>
   </div>
 
 We have obtained an enriched log stream using ksqldb and also we have created a table with the number of attack attempts based on the host.
