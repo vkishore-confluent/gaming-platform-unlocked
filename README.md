@@ -1,12 +1,14 @@
 # Gaming Platform Unlocked - Data Streaming Pipeline for Gaming Applications
 
-In this demonstration, we present three essential use cases that illustrate the versatility and reliability of Confluent Cloud for building your data streaming pipeline for your gaming application. These use cases provide valuable insights into the technical requirements and considerations for creating a robust and efficient gaming data streaming system.
+Data streaming technologies like Apache Kafka have become a fundamental part of the underlying infrastructure of gaming applications. This is because they enable real-time stream processing (facilitating improved user experiences), are able to handle large volumes of complex data, and can scale across distributed servers and data centers. 
+
+Confluent Cloud – the complete, cloud-native and ‘everywhere’ version of Apache Kafka – is used by many gaming companies as the backbone of their data infrastructures. In this demonstration, we’ll show why by guiding you through three technical aspects of Confluent which facilitate the delivery of gaming applications. These are: 
 
 * Producing Multiple Event Types in Single Topic
-* Preventing duplicate message with ksqlDB
-* Observability of the gaming platform
+* Preventing duplicate messages with ksqlDB
+* Monitoring and observing event streams 
 
- By exploring these scenarios, you will gain a deeper understanding of how Confluent Cloud can be adapted to various real-world applications.
+By exploring these aspects, you will gain a deeper understanding of how Confluent Cloud can be adapted to a wide range of gaming applications. 
 
 ## Requirements
 
@@ -120,6 +122,8 @@ We will cover this whole use case in three different parts to get a better under
 
 ### 1. Producing Multiple Event Types in Single Topic
 
+A seamless gaming experience requires events of different types (relating to the same entity) to be consistently and sequentially ordered. Given that ordering is not preserved across multiple partitions, events of different types must flow through a single topic if they’re to be sequentially ordered. Confluent’s Schema Registry can be used to ensure that data of different types in a single topic remains consistent between consumers and producers. This also helps to reduce transfer costs.
+
 In order to maintain order and process events of related data, storing multiple event types in one topic is crucial. Also, in order to reduce the transfer cost, integrating the producers and consumers with a schema registry will be the first item in your list.
 
 ### Architecture Diagram:
@@ -152,11 +156,11 @@ This python script sends two types of events *Player Health* and *Player Positio
 
 ## 2. Preventing duplicate message with ksqlDB:
 
-Even when you tune your producers based on best practices, message duplication can occur with any API communication. In order to process duplicate messages and discard them quickly, you can utilize ksqlDB with a twist
+Duplicate messages can significantly disrupt a gamer’s experience in a number of different ways. They can trigger glitches in player behavior, break game logic and cause applications to crash. 
 
-With KsqlDB, you can continuously transform, enrich, join, and aggregate your data using simple SQL syntax. You can gain value from your data directly from Confluent in real-time. 
+This can be avoided by leveraging stream processing – either with flink or ksqlDB – to process and remove duplicate events. In this example, we use ksqlDB, which is available as fully-managed on Confluent Cloud.
 
-Also, ksqlDB is a fully managed service within Confluent Cloud with a 99.9% uptime SLA. You can now focus on developing services and building your data pipeline while letting Confluent manage your resources for you.
+Even when you tune your producers based on best practices, message duplication can occur with any API communication. With KsqlDB, you can continuously transform, enrich, join, and aggregate your data using simple SQL syntax. You can gain value from your data directly from Confluent in real-time. Also, ksqlDB is a fully managed service within Confluent Cloud with a 99.9% uptime SLA. You can now focus on developing services and building your data pipeline while letting Confluent manage your resources for you.
 
 ### Generate Sample data using python:
 
@@ -307,11 +311,13 @@ Once you have completed all the steps, you will have the complete stream lineage
 
 You can access the Stream Lineage Feature inside Confluent Cloud by accessing the *Stream Lineage* menu in the left sidebar of the Confluent Cloud Dashboard.
 
-## Observability of the gaming platform
+## 3. Observability of the gaming platform
 
-Creating observability for mission- critical applications can be challenging, but with a decent strategy you will be able to collect important metrics and errors from your servers.
+The ability to observe and monitor the status of your streaming data pipelines is highly valued regardless of which applications they’re powering. In the context of gaming applications, observability and monitoring help to ensure that platforms remain online and there’s no disruption to play. 
 
-We are going to use a tiny software called fluent-bit to demonstrate the observability feature. Please follow the following steps to continue with the demo.
+In this demo, we’re going to use fluentbit to process logs and identify SSH (Secure Shell) attacks. Fluent Bit allows you to 
+
+Please follow the following steps to continue with the demo.
 
 ### Start Fluent-Bit service:
 
@@ -398,3 +404,48 @@ Let us see a quick example on how to use ksqldb to process the logs and look for
 We have obtained an enriched log stream using ksqldb and also we have created a table with the number of attack attempts based on the host.
 
 This data can further be consumed into other alerting or notifications services to trigger alerts on the system.
+
+## Other Features in Confluent Cloud
+
+- High Availability 
+- Cloud Audit Logs
+- Custom Connectors
+- Encryption
+- Stream Lineage
+- Role Based Access Control (RBAC)
+
+## Teardown
+
+It's recommended that you delete any resources that were created during the demo so you don't incur additional charges. follow the steps below to stop generating additional data and stop all running services and drop the entire infrastructure spun up by terraform.
+
+### Python Scripts:
+
+Head over to the temrinal running the python script and run the following command to stop the running python scripts
+
+  ```bash
+  [ctrl] + Z
+  ```
+
+### Fluent Bit Service:
+
+Head over to the temrinal running the fluent-bit service and run the following command to stop the service.
+
+  ```bash
+  [ctrl] + Z
+  ```
+
+### Infrastructure:
+
+1. Run the following command to delete all resources created by Terraform
+
+  ```bash
+  terraform apply -destroy
+  ```
+2. If you are prompted to delete the Persistent Queries if any, head over to the Confluent Cloud dashboard and then select ksqldb on the left menu and delete all queries inside the **Persistent Queries** section
+
+# References
+
+1. Introduction to ksqlDB - [tutorial](https://developer.confluent.io/courses/ksqldb/intro/)
+2. Schema Registry overview - [doc](https://docs.confluent.io/platform/current/schema-registry/index.html)
+3. Putting Several Event Types in the Same Topic – Revisited - [blog](https://www.confluent.io/en-gb/blog/multiple-event-types-in-the-same-kafka-topic/)
+4. Fluent Bit for Kafka - [doc](https://docs.fluentbit.io/manual/pipeline/outputs/kafka)
