@@ -124,8 +124,6 @@ We will cover this whole use case in three different parts to get a better under
 
 A seamless gaming experience requires events of different types (relating to the same entity) to be consistently and sequentially ordered. Given that ordering is not preserved across multiple partitions, events of different types must flow through a single topic if they’re to be sequentially ordered. Confluent’s Schema Registry can be used to ensure that data of different types in a single topic remains consistent between consumers and producers. This also helps to reduce transfer costs.
 
-In order to maintain order and process events of related data, storing multiple event types in one topic is crucial. Also, in order to reduce the transfer cost, integrating the producers and consumers with a schema registry will be the first item in your list.
-
 ### Architecture Diagram:
 
 <div align="center"> 
@@ -159,8 +157,6 @@ This python script sends two types of events *Player Health* and *Player Positio
 Duplicate messages can significantly disrupt a gamer’s experience in a number of different ways. They can trigger glitches in player behavior, break game logic and cause applications to crash. 
 
 This can be avoided by leveraging stream processing – either with flink or ksqlDB – to process and remove duplicate events. In this example, we use ksqlDB, which is available as fully-managed on Confluent Cloud.
-
-Even when you tune your producers based on best practices, message duplication can occur with any API communication. With KsqlDB, you can continuously transform, enrich, join, and aggregate your data using simple SQL syntax. You can gain value from your data directly from Confluent in real-time. Also, ksqlDB is a fully managed service within Confluent Cloud with a 99.9% uptime SLA. You can now focus on developing services and building your data pipeline while letting Confluent manage your resources for you.
 
 ### Generate Sample data using python:
 
@@ -315,9 +311,7 @@ You can access the Stream Lineage Feature inside Confluent Cloud by accessing th
 
 The ability to observe and monitor the status of your streaming data pipelines is highly valued regardless of which applications they’re powering. In the context of gaming applications, observability and monitoring help to ensure that platforms remain online and there’s no disruption to play. 
 
-In this demo, we’re going to use fluentbit to process logs and identify SSH (Secure Shell) attacks. Fluent Bit allows you to 
-
-Please follow the following steps to continue with the demo.
+In this demo, we’re going to use Fluent Bit to process logs and identify SSH (Secure Shell) attacks. As a lightweight, highly scalable logging and metrics processor, Fluent Bit is well suited to delivering observability pipelines for gaming applications. Please follow the following steps to continue with the demo.
 
 ### Start Fluent-Bit service:
 
